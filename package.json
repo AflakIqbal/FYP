@@ -1,0 +1,37 @@
+{
+  "name": "sawari",
+  "version": "1.0.0",
+  "description": "FYP Project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "server": "nodemon server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "Aflak",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.4.1",
+    "check": "^1.0.0",
+    "config": "^3.2.4",
+    "create-react-app": "^3.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.3.0",
+    "formidable": "^1.2.2",
+    "json": "^9.0.6",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.13",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "react-bootstrap": "^1.0.0-beta.17",
+    "react-router-dom": "^5.1.2",
+    "validator": "^12.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.0",
+    "nodemon": "^2.0.2"
+  }
+}
