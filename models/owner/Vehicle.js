@@ -3,40 +3,40 @@ const mongoose = require('mongoose');
 const VehicleSchema = mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'owner'
+    ref: 'owner',
   },
   available: {
     type: Boolean,
-    default: true
+    default: true,
   },
   type: {
     type: String,
-    required: true
+    required: true,
   },
   manufacturer: {
     type: String,
-    required: true
+    required: true,
   },
   model: {
     type: String,
-    required: true
+    required: true,
   },
   year: {
     type: Number,
-    required: true
+    required: true,
   },
   seatingCapacity: {
     type: Number,
-    required: true
+    required: true,
   },
   transmission: {
     type: String,
-    required: true
+    required: true,
   },
   fare: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 });
 
 module.exports = Vehicle = mongoose.model('vehicle', VehicleSchema);

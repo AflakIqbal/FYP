@@ -23,27 +23,23 @@ router.get('/', (req, res) => {
 router.post(
   '/register',
   [
-    check('name', 'name is required')
-      .not()
-      .isEmpty(),
-    check('address', 'address is required')
-      .not()
-      .isEmpty(),
-    check('cellPhone', 'Number is required')
-      .not()
-      .isEmpty(),
+    check('name', 'name is required').not().isEmpty(),
+    check('address', 'address is required').not().isEmpty(),
+    check('city', 'city is required').not().isEmpty(),
+    check('cellPhone', 'Number is required').not().isEmpty(),
     check('email', 'email is required').isEmail(),
+    check('city', 'city is required').not().isEmpty(),
     check(
       'password',
       'please enter a password with 6 or more characters'
-    ).isLength({ min: 6 })
+    ).isLength({ min: 6 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { name, email, password, address, cellPhone } = req.body;
+    const { name, email, password, address, city, cellPhone } = req.body;
     console.log(req.body);
 
     try {
@@ -60,7 +56,8 @@ router.post(
         email,
         password,
         cellPhone,
-        address
+        address,
+        city,
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -69,8 +66,8 @@ router.post(
 
       const payload = {
         user: {
-          id: owner.id
-        }
+          id: owner.id,
+        },
       };
 
       jwt.sign(
@@ -144,12 +141,7 @@ router.post(
 // @access  private
 router.post(
   '/reportCustomer/:customerId',
-  [
-    auth,
-    check('report', 'Report is required')
-      .not()
-      .isEmpty()
-  ],
+  [auth, check('report', 'Report is required').not().isEmpty()],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -162,7 +154,7 @@ router.post(
       const newReport = new ReportCustomer({
         owner: req.user.id,
         customer: req.params.customerId,
-        report
+        report,
       });
 
       await newReport.save();

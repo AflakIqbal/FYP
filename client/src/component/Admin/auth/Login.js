@@ -7,15 +7,15 @@ import { login } from '../../../actions/Admin/auth';
 const AdminLogin = ({ login, isAuthenticated }) => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
 
   const { email, password } = formData;
 
-  const onChange = e =>
+  const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = e => {
+  const onSubmit = (e) => {
     e.preventDefault();
 
     login(email, password);
@@ -32,14 +32,14 @@ const AdminLogin = ({ login, isAuthenticated }) => {
       <p className='lead'>
         <i className='fas fa-user'></i> sign Into Your Account
       </p>
-      <form className='form' onSubmit={e => onSubmit(e)}>
+      <form className='form' onSubmit={(e) => onSubmit(e)}>
         <div className='form-group'>
           <input
             type='email'
             placeholder='Email Address'
             name='email'
             value={email}
-            onChange={e => onChange(e)}
+            onChange={(e) => onChange(e)}
             required
           />
         </div>
@@ -50,7 +50,7 @@ const AdminLogin = ({ login, isAuthenticated }) => {
             placeholder='Password'
             name='password'
             value={password}
-            onChange={e => onChange(e)}
+            onChange={(e) => onChange(e)}
             minLength='6'
           />
         </div>
@@ -62,10 +62,10 @@ const AdminLogin = ({ login, isAuthenticated }) => {
 };
 AdminLogin.prototype = {
   login: PropTypes.func.isRequired,
-  isAuthenticated: PropTypes.bool
+  isAuthenticated: PropTypes.bool,
 };
 
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, { login })(AdminLogin);

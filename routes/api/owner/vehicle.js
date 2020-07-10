@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../../../middleware/auth');
 const Vehicle = require('../../../models/owner/Vehicle');
+const Booking = require('../../../models/owner/Booking');
 const Owner = require('../../../models/owner/Owner');
 const { check, validationResult } = require('express-validator');
 
@@ -12,7 +13,7 @@ const { check, validationResult } = require('express-validator');
 router.get('/my', auth, async (req, res) => {
   try {
     const vehicles = await Vehicle.find({
-      owner: req.user.id
+      owner: req.user.id,
     }).populate('owner', ['name', 'address']);
 
     if (!vehicles) {
@@ -26,31 +27,19 @@ router.get('/my', auth, async (req, res) => {
 });
 
 // @route   post /api/vehicle/add
-// @desc    get current owner vehicle
+// @desc    ADD new owner's vehicle
 // @access  Private
 router.post(
   '/add',
   [
     auth,
-    check('type', 'type is required')
-      .not()
-      .isEmpty(),
-    check('manufacturer', 'Manufacturer is required')
-      .not()
-      .isEmpty(),
-    check('model', 'Model is required')
-      .not()
-      .isEmpty(),
-    check('year', 'Year is required')
-      .not()
-      .isEmpty(),
-    check('seatingCapacity', 'Capacity is required')
-      .not()
-      .isEmpty(),
-    check('transmission', 'Transmition is required')
-      .not()
-      .isEmpty(),
-    check('fare', 'fare is required & should be a number').isInt()
+    check('type', 'type is required').not().isEmpty(),
+    check('manufacturer', 'Manufacturer is required').not().isEmpty(),
+    check('model', 'Model is required').not().isEmpty(),
+    check('year', 'Year is required').not().isEmpty(),
+    check('seatingCapacity', 'Capacity is required').not().isEmpty(),
+    check('transmission', 'Transmition is required').not().isEmpty(),
+    check('fare', 'fare is required & should be a number').isInt(),
   ],
   async (req, res) => {
     console.log(req.body);
@@ -66,7 +55,7 @@ router.post(
       year,
       seatingCapacity,
       transmission,
-      fare
+      fare,
     } = req.body;
 
     //buid vehicla object
@@ -112,7 +101,7 @@ router.get('/all', async (req, res) => {
   try {
     const vehicles = await Vehicle.find().populate('owner', [
       'name',
-      'address'
+      'address',
     ]);
     res.json(vehicles);
   } catch (err) {
@@ -121,13 +110,51 @@ router.get('/all', async (req, res) => {
   }
 });
 
-// @route   post /api/vehicle/ownerVehicle
-// @desc    get all vehicle
+// @route   post /api/Ownervehicle/ownerVehicle
+// @desc    get all owner vehicle's
 // @access  Public
 router.get('/ownerVehicle', auth, async (req, res) => {
   try {
+    console.log('route pe pohncha');
     const vehicles = await Vehicle.find({ owner: req.user.id });
+    console.log(req.user.id);
+    console.log(vehicles);
     res.json(vehicles);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/bookings
+// @desc    get all bookings of a vehicle
+// @access  Public
+router.get('/bookings/:vehicleId', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      vehicle: req.params.vehicleId,
+    }).populate('customer', ['name']);
+    res.json(bookings);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/bookings
+// @desc    get all bookings of a owner
+// @access  Public
+router.get('/ownerBookings', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      owner: req.user.id,
+    })
+      .populate('vehicle', ['manufacturer', 'model'])
+      .populate('customer', ['name']);
+    res.json(bookings);
+    console.log('route chala');
   } catch (err) {
     console.error(err.message);
     res.status(500).send('server error');

@@ -27,23 +27,15 @@ router.get('/', (req, res) => {
 router.post(
   '/register',
   [
-    check('name', 'name is required')
-      .not()
-      .isEmpty(),
-    check('address', 'address is required')
-      .not()
-      .isEmpty(),
-    check('cellPhone', 'Number is required')
-      .not()
-      .isEmpty(),
+    check('name', 'name is required').not().isEmpty(),
+    check('address', 'address is required').not().isEmpty(),
+    check('cellPhone', 'Number is required').not().isEmpty(),
     check('email', 'email is required').isEmail(),
     check(
       'password',
       'please enter a password with 6 or more characters'
     ).isLength({ min: 6 }),
-    check('officeLocation', 'location is required')
-      .not()
-      .isEmpty()
+    check('officeLocation', 'location is required').not().isEmpty(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -57,7 +49,7 @@ router.post(
       password,
       cellPhone,
       address,
-      officeLocation
+      officeLocation,
     } = req.body;
 
     try {
@@ -75,7 +67,7 @@ router.post(
         password,
         cellPhone,
         address,
-        officeLocation
+        officeLocation,
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -84,8 +76,8 @@ router.post(
 
       const payload = {
         user: {
-          id: newSubAdmin.id
-        }
+          id: newSubAdmin.id,
+        },
       };
 
       jwt.sign(
@@ -111,7 +103,7 @@ router.get('/viewOwner', auth, async (req, res) => {
   try {
     const subAdmin = await SubAdmin.findById(req.user.id);
 
-    const owners = await Owner.find({ address: subAdmin.address });
+    const owners = await Owner.find({ address: subAdmin.city });
     res.json(owners);
   } catch (err) {
     console.error(err.message);
@@ -143,7 +135,7 @@ router.get('/viewCustomer', auth, async (req, res) => {
   try {
     const subAdmin = await SubAdmin.findById(req.user.id);
 
-    const customers = await Customer.find({ address: subAdmin.address });
+    const customers = await Customer.find({ address: subAdmin.city });
     res.json(customers);
   } catch (err) {
     console.error(err.message);
@@ -204,7 +196,7 @@ router.get('/viewByOwnerId/:_id', async (req, res) => {
 router.get('/viewVehicleBookings/:_id', async (req, res) => {
   try {
     const booking = await Booking.find({
-      vehicle: req.params._id
+      vehicle: req.params._id,
     }).populate('customer', ['name', 'address']);
 
     res.json(booking);

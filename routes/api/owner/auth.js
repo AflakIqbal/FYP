@@ -14,6 +14,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const owner = await Owner.findById(req.user.id).select('-password');
     res.json(owner);
+    console.log(owner);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('server error');
@@ -27,7 +28,7 @@ router.post(
   '/login',
   [
     check('email', 'email is required').isEmail(),
-    check('password', 'password is required').exists()
+    check('password', 'password is required').exists(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -56,8 +57,8 @@ router.post(
 
       const payload = {
         user: {
-          id: owner.id
-        }
+          id: owner.id,
+        },
       };
 
       jwt.sign(

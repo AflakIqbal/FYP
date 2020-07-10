@@ -3,40 +3,50 @@ const mongoose = require('mongoose');
 const BookingSchema = mongoose.Schema({
   customer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'customer'
+    ref: 'customer',
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'owner'
+    ref: 'owner',
   },
   vehicle: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'vehicle'
+    ref: 'vehicle',
   },
   days: {
     type: Number,
-    required: true
+    required: true,
   },
   date: {
     type: Date,
-    default: Date.now
+    min: '1987-09-28',
+    max: '2020-12-30',
+    default: Date.now,
   },
   ownerFeedback: {
     rating: {
-      type: Number
+      type: Number,
     },
     feedback: {
-      type: String
-    }
+      type: String,
+    },
   },
   cusomterFeedback: {
     rating: {
-      type: Number
+      type: Number,
     },
     feedback: {
-      type: String
-    }
-  }
+      type: String,
+    },
+  },
+  vehicleFeedback: {
+    rating: {
+      type: Number,
+    },
+    feedback: {
+      type: String,
+    },
+  },
 });
 
 module.exports = Booking = mongoose.model('booking', BookingSchema);
