@@ -150,6 +150,23 @@ router.get('/bookings/:vehicleId', auth, async (req, res) => {
   }
 });
 
+// @route   post /api/vehicle/bookings
+// @desc    get all bookings of a vehicle
+// @access  Public
+router.get('/booking/:vehicleId', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      vehicle: req.params.vehicleId,
+      bookedForOwner: 'true',
+    }).populate('customer', ['name']);
+    res.json(bookings);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
 // @route   post /api/vehicle/vehicle/:id
 // @desc    get all bookings of a vehicle
 // @access  Public
@@ -191,9 +208,29 @@ router.get('/ownerBookings', auth, async (req, res) => {
   try {
     const bookings = await Booking.find({
       owner: req.user.id,
+      bookedForOwner: 'true',
     })
       .populate('vehicle', ['manufacturer', 'model'])
       .populate('customer', ['name']);
+    res.json(bookings);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/bookings
+// @desc    get all bookings of a owner
+// @access  Public
+router.get('/ownerCurrentBookings', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      owner: req.user.id,
+      bookedForOwner: 'false',
+    })
+      .populate('vehicle', ['manufacturer', 'model'])
+      .populate('customer', ['name', 'cellPhone']);
     res.json(bookings);
     console.log('route chala');
   } catch (err) {

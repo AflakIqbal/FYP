@@ -21,6 +21,10 @@ const BookingSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  bookedForOwner: {
+    type: Boolean,
+    default: false,
+  },
   comments: {
     type: String,
   },

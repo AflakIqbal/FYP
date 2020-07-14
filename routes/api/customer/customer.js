@@ -142,41 +142,54 @@ router.post('/end/:vehicleId', auth, async (req, res) => {
   }
 });
 
+// @route   POST /api/customer/booked/:vehicleId
+// @desc    change the booking status
+// @access  Private
+router.post('/booked/:bookingID', auth, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.bookingID);
+
+    booking.booked = true;
+
+    await booking.save();
+    res.json({ msg: 'Sucessfully' });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('server error');
+  }
+});
+
 // @route   POST /api/customer/rank/:bookingId
 // @desc    rank & feedback
 // @access  Private
-router.post(
-  '/rank/:bookingId',
-  [auth, check('rank', 'Rank is required and should be integer').isInt()],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { rank, feedback } = req.body;
-
-      const booking = await Booking.findById(req.params.bookingId);
-
-      if (!booking) {
-        return res.status(400).json({ msg: 'Booking not found' });
-      }
-
-      if (feedback) {
-        booking.ownerFeedback.feedback = feedback;
-      }
-      booking.ownerFeedback.rating = rank;
-
-      await booking.save();
-
-      res.json(booking);
-    } catch (err) {
-      console.log(err.message);
-      res.status(500).send('server error');
+router.post('/rank/:bookingId', auth, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    const { feedbackOwner, feedbackVehicle, rankOwner, rankVehicle } = req.body;
+
+    const booking = await Booking.findById(req.params.bookingId);
+
+    if (!booking) {
+      return res.status(400).json({ msg: 'Booking not found' });
+    }
+
+    booking.ownerFeedback.feedback = feedbackOwner;
+    booking.ownerFeedback.rating = rankOwner;
+    booking.vehicleFeedback.feedback = feedbackVehicle;
+    booking.vehicleFeedback.rating = rankVehicle;
+
+    await booking.save();
+
+    res.json(booking);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('server error');
   }
-);
+});
 
 // @route   POST /api/customer/rank/:bookingId
 // @desc    rank & feedback to vehicle
