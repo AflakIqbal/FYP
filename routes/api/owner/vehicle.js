@@ -39,7 +39,9 @@ router.post(
     check('year', 'Year is required').not().isEmpty(),
     check('seatingCapacity', 'Capacity is required').not().isEmpty(),
     check('transmission', 'Transmition is required').not().isEmpty(),
+    check('city', 'City is required').not().isEmpty(),
     check('fare', 'fare is required & should be a number').isInt(),
+    check('driver', 'driver required as boolean').isBoolean(),
   ],
   async (req, res) => {
     console.log(req.body);
@@ -50,12 +52,14 @@ router.post(
 
     const {
       type,
+      city,
       manufacturer,
       model,
       year,
       seatingCapacity,
       transmission,
       fare,
+      driver,
     } = req.body;
 
     //buid vehicla object
@@ -68,6 +72,8 @@ router.post(
     if (seatingCapacity) vehicleFields.seatingCapacity = seatingCapacity;
     if (transmission) vehicleFields.transmission = transmission;
     if (fare) vehicleFields.fare = fare;
+    if (city) vehicleFields.city = city;
+    if (driver) vehicleFields.driver = driver;
 
     try {
       //   let vehicle = await Vehicle.findOne({ owner: req.user.id });
@@ -134,8 +140,43 @@ router.get('/bookings/:vehicleId', auth, async (req, res) => {
   try {
     const bookings = await Booking.find({
       vehicle: req.params.vehicleId,
+      booked: 'true',
     }).populate('customer', ['name']);
     res.json(bookings);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/vehicle/:id
+// @desc    get all bookings of a vehicle
+// @access  Public
+router.get('/vehicle/:id', auth, async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findOne({
+      _id: req.params.id,
+    });
+    res.json(vehicle);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/vehicles
+// @desc    get all bookings of a vehicle
+// @access  Public
+router.get('/vehicles/:type/:city/:driver', auth, async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find({
+      type: req.params.type,
+      city: req.params.city,
+      driver: req.params.driver,
+    }).populate('owner', ['city']);
+    res.json(vehicles);
     console.log('route chala');
   } catch (err) {
     console.error(err.message);
@@ -153,6 +194,25 @@ router.get('/ownerBookings', auth, async (req, res) => {
     })
       .populate('vehicle', ['manufacturer', 'model'])
       .populate('customer', ['name']);
+    res.json(bookings);
+    console.log('route chala');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('server error');
+  }
+});
+
+// @route   post /api/vehicle/bookings
+// @desc    get all bookings of a customer
+// @access  Public
+router.get('/customerBookings', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      customer: req.user.id,
+      booked: 'true',
+    })
+      .populate('vehicle', ['manufacturer', 'model'])
+      .populate('owner', ['name']);
     res.json(bookings);
     console.log('route chala');
   } catch (err) {

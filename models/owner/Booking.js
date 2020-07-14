@@ -17,6 +17,13 @@ const BookingSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  booked: {
+    type: Boolean,
+    default: false,
+  },
+  comments: {
+    type: String,
+  },
   date: {
     type: Date,
     min: '1987-09-28',

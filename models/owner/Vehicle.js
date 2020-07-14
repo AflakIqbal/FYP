@@ -5,9 +5,16 @@ const VehicleSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'owner',
   },
+  city: {
+    type: String,
+  },
   available: {
     type: Boolean,
     default: true,
+  },
+  driver: {
+    type: Boolean,
+    default: false,
   },
   type: {
     type: String,
