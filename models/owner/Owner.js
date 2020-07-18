@@ -25,6 +25,9 @@ const OwnerSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  imageURI: {
+    type: String,
+  },
 });
 
 module.exports = Owner = mongoose.model('owner', OwnerSchema);

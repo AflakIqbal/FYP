@@ -103,7 +103,7 @@ router.get('/viewOwner', auth, async (req, res) => {
   try {
     const subAdmin = await SubAdmin.findById(req.user.id);
 
-    const owners = await Owner.find({ address: subAdmin.city });
+    const owners = await Owner.find({ city: subAdmin.address });
     res.json(owners);
   } catch (err) {
     console.error(err.message);
@@ -135,7 +135,7 @@ router.get('/viewCustomer', auth, async (req, res) => {
   try {
     const subAdmin = await SubAdmin.findById(req.user.id);
 
-    const customers = await Customer.find({ address: subAdmin.city });
+    const customers = await Customer.find({ city: subAdmin.address });
     res.json(customers);
   } catch (err) {
     console.error(err.message);

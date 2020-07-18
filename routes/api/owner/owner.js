@@ -1,4 +1,7 @@
 const express = require('express');
+const cloudinary = require('cloudinary').v2;
+//const cloudinaryStorage = require('multer-storage-cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const Owner = require('../../../models/owner/Owner');
@@ -9,12 +12,64 @@ const auth = require('../../../middleware/auth');
 const ReportCustomer = require('../../../models/reports/ReportCustomer');
 const Booking = require('../../../models/owner/Booking');
 
+var multer = require('multer');
+
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     console.log(file);
+//     cb(null, '../../Images/Owner');
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.filename);
+//   },
+// });
+
+cloudinary.config({
+  cloud_name: 'sawari',
+  api_key: '578152951985421',
+  api_secret: 'Ht74AoMOnhz7cEsXSFK6vv_7Nqw',
+});
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+
+  allowedFormats: ['jpg', 'png'],
+  destination: function (req, file, cb) {
+    cb(null, 'folder');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+var upload = multer({
+  storage: storage,
+}).single('file');
+var upload = multer({ storage: storage, limits: { fileSize: 12582912 } });
 // @route   GET /api/owner
 // @desc    Test Route
 // @access  Public
 router.get('/', (req, res) => {
   res.send('Owner route');
   console.log(req.body);
+});
+
+router.post('/uploadPhoto', (req, res, next) => {
+  // console.log(req.file);
+  try {
+    upload.single('photo')(req, res, (err) => {
+      console.log(req.file);
+      console.log(req.file.path);
+      res.status(200).json({
+        read: true,
+        url: req.file.path,
+      });
+    });
+  } catch (e) {
+    res.status(500).json({
+      read: false,
+      err: e,
+    });
+    console.log(e);
+  }
 });
 
 // @route   POST /api/owner/register
@@ -39,7 +94,15 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { name, email, password, address, city, cellPhone } = req.body;
+    const {
+      name,
+      email,
+      password,
+      address,
+      city,
+      cellPhone,
+      imageURI,
+    } = req.body;
     console.log(req.body);
 
     try {
@@ -58,6 +121,7 @@ router.post(
         cellPhone,
         address,
         city,
+        imageURI,
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -114,6 +178,45 @@ router.post('/booked/:bookingID', auth, async (req, res) => {
   } catch (err) {
     console.log(err.message);
     res.status(500).send('server error');
+  }
+});
+
+// @route   PUT /api/owner/update/:Id
+// @desc    update
+// @access  Private
+router.put('/update', auth, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    let owner = await Owner.findById(req.user.id);
+
+    if (!owner) {
+      return res.status(400).json({ msg: 'Group does not exist' });
+    }
+
+    const { name, address, cellPhone, city, email } = req.body;
+
+    owner = await Owner.findOneAndUpdate(
+      { _id: req.user.id },
+      {
+        $set: {
+          name,
+          address,
+          cellPhone,
+          city,
+          email,
+        },
+      },
+      { new: true }
+    );
+
+    res.json(owner);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send('Server error');
   }
 });
 

@@ -3,32 +3,35 @@ const mongoose = require('mongoose');
 const subAdminSchema = mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   cellPhone: {
     type: String,
-    required: true
+    required: true,
   },
   address: {
     type: String,
-    required: true
+    required: true,
   },
   officeLocation: {
     type: String,
-    required: true
+    required: true,
   },
   photo: {
     data: Buffer,
-    ContentType: String
-  }
+    ContentType: String,
+  },
+  imageURI: {
+    type: String,
+  },
 });
 
 module.exports = subAdmin = mongoose.model('subAdmin', subAdminSchema);

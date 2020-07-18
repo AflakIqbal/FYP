@@ -60,6 +60,7 @@ router.post(
       transmission,
       fare,
       driver,
+      imageURI,
     } = req.body;
 
     //buid vehicla object
@@ -74,6 +75,7 @@ router.post(
     if (fare) vehicleFields.fare = fare;
     if (city) vehicleFields.city = city;
     if (driver) vehicleFields.driver = driver;
+    if (imageURI) vehicleFields.imageURI = imageURI;
 
     try {
       //   let vehicle = await Vehicle.findOne({ owner: req.user.id });
@@ -192,6 +194,7 @@ router.get('/vehicles/:type/:city/:driver', auth, async (req, res) => {
       type: req.params.type,
       city: req.params.city,
       driver: req.params.driver,
+      available: 'true',
     }).populate('owner', ['city']);
     res.json(vehicles);
     console.log('route chala');

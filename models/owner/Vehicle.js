@@ -44,6 +44,9 @@ const VehicleSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  imageURI: {
+    type: String,
+  },
 });
 
 module.exports = Vehicle = mongoose.model('vehicle', VehicleSchema);

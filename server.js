@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
 const connectDb = require('./config/db');
-
+connectDb();
+var path = require('path');
+// app.use(express.static(path.join(__dirname, 'public')));
 // Init middlware
 app.use(express.json({ extended: false }));
-
+//app.use(express.static(path.join(__dirname, 'Images')));
+app.use(express.static(path.join(__dirname, 'Images')));
+// app.use(/'/Images', express.static(__dirname + '/Images'));
 // Connect to database
-connectDb();
 
 // Define routes
 

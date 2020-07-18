@@ -32,7 +32,15 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, address, cellPhone, city } = req.body;
+    const {
+      name,
+      email,
+      password,
+      address,
+      cellPhone,
+      city,
+      imageURI,
+    } = req.body;
 
     try {
       let customer = await Customer.findOne({ email });
@@ -50,6 +58,7 @@ router.post(
         cellPhone,
         address,
         city,
+        imageURI,
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -194,38 +203,34 @@ router.post('/rank/:bookingId', auth, async (req, res) => {
 // @route   POST /api/customer/rank/:bookingId
 // @desc    rank & feedback to vehicle
 // @access  Private
-router.post(
-  '/rankVehicle/:bookingId',
-  [auth, check('rank', 'Rank is required and should be integer').isInt()],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { rank, feedback } = req.body;
-
-      const booking = await Booking.findById(req.params.bookingId);
-
-      if (!booking) {
-        return res.status(400).json({ msg: 'Booking not found' });
-      }
-
-      if (feedback) {
-        booking.vehicleFeedback.feedback = feedback;
-      }
-      booking.vehicleFeedback.rating = rank;
-
-      await booking.save();
-
-      res.json(booking);
-    } catch (err) {
-      console.log(err.message);
-      res.status(500).send('server error');
+router.post('/rankVehicle/:bookingId', auth, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    const { rank, feedback } = req.body;
+
+    const booking = await Booking.findById(req.params.bookingId);
+
+    if (!booking) {
+      return res.status(400).json({ msg: 'Booking not found' });
+    }
+
+    if (feedback) {
+      booking.vehicleFeedback.feedback = feedback;
+    }
+    booking.vehicleFeedback.rating = rank;
+
+    await booking.save();
+
+    res.json(booking);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('server error');
   }
-);
+});
 
 // @route   POST /api/reportOwner/:customerId
 // @desc    Report Customer
@@ -256,5 +261,44 @@ router.post(
     }
   }
 );
+
+// @route   PUT /api/owner/update/:Id
+// @desc    update
+// @access  Private
+router.put('/update', auth, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    let customer = await Customer.findById(req.user.id);
+
+    if (!customer) {
+      return res.status(400).json({ msg: 'Group does not exist' });
+    }
+
+    const { name, address, cellPhone, city, email } = req.body;
+
+    customer = await Customer.findOneAndUpdate(
+      { _id: req.user.id },
+      {
+        $set: {
+          name,
+          address,
+          cellPhone,
+          city,
+          email,
+        },
+      },
+      { new: true }
+    );
+
+    res.json(customer);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;
